@@ -10,7 +10,7 @@ export const signAccessJWT = async (payload) => {
 
 export const signRefreshJWT = async (payload) => {
   const refreshJwt = jwt.sign(payload, process.env.JWT_REFRESH_KEY, {
-    expiresIn: "30d",
+    expiresIn: "7d",
   })
 
   await updateUser({ _id: payload._id }, { refreshJwt })

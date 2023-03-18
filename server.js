@@ -19,9 +19,11 @@ app.use(cors())
 
 // import routes
 import authRouter from "./src/routers/authRouter.js"
+import blogRouter from "./src/routers/blogRouter.js"
 
 // use routers
 app.use("/api/auth", authRouter)
+app.use("/api/blog", blogRouter)
 
 // Global error handler
 app.use((error, req, res, next) => {

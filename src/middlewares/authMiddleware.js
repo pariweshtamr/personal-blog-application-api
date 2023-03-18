@@ -1,5 +1,5 @@
-import { verifyAccessJWT } from "../helpers/jwtHelper"
-import { getUserById } from "../models/User/UserModel"
+import { verifyAccessJWT } from "../helpers/jwtHelper.js"
+import { getUserById } from "../models/User/UserModel.js"
 
 export const verifyUser = async (req, res, next) => {
   try {
@@ -23,7 +23,7 @@ export const verifyUser = async (req, res, next) => {
     }
     const user = await getUserById(decoded._id).select("-password")
 
-    if (user.email === "tamrpariwesh@gmail.com") {
+    if (user?._id) {
       req.user = user
       return next()
     }

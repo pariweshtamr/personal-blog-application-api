@@ -1,12 +1,29 @@
 import express from "express"
 import { comparePassword, hashPassword } from "../helpers/bcryptHelper.js"
 import { createJwts } from "../helpers/jwtHelper.js"
+import { verifyUser } from "../middlewares/authMiddleware.js"
 import { createUser, getUserByFilter } from "../models/User/UserModel.js"
 
 const router = express.Router()
 
-// register user
+// get user
+router.get("/", verifyUser, async (req, res, next) => {
+  try {
+    const user = req.user
 
+    const { __v, ...others } = user._doc
+
+    res.json({
+      status: "success",
+      message: "User Found!",
+      user: others,
+    })
+  } catch (error) {
+    next(error)
+  }
+})
+
+// register user
 router.post("/register", async (req, res, next) => {
   const { email, password } = req.body
   try {
@@ -68,8 +85,8 @@ router.post("/login", async (req, res, next) => {
     return res.status(200).json({
       status: "success",
       message: "Login Successful",
-      user,
       tokens,
+      user,
     })
   } catch (error) {
     next(error)
