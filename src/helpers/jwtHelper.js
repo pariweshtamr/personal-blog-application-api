@@ -32,3 +32,11 @@ export const verifyAccessJWT = (token) => {
     return error.message
   }
 }
+
+export const verifyRefreshJWT = (token) => {
+  try {
+    return jwt.verify(token, process.env.JWT_REFRESH_KEY)
+  } catch (error) {
+    return error.message
+  }
+}

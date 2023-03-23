@@ -34,10 +34,9 @@ router.get("/find/:_id", async (req, res, next) => {
 
 router.get("/featured", async (req, res, next) => {
   try {
-    const blogs = await getBlogsByFilter({ featured: true }).populate(
-      "userId",
-      "-password"
-    )
+    const blogs = await getBlogsByFilter({ featured: true })
+      .populate("userId", "-password")
+      .limit(3)
     return res.status(200).json(blogs)
   } catch (error) {
     next(error)
@@ -66,11 +65,11 @@ router.post("/", verifyUser, async (req, res, next) => {
 router.put("/updateBlog/:_id", verifyUser, async (req, res, next) => {
   try {
     const blog = await getSingleBlog(req.params._id)
-    if (blog.userId !== req.user._id) {
+    if (blog.userId.toString() !== req.user._id.toString()) {
       throw new Error("You can only update your blog posts!")
     }
 
-    const updateBlog = await updateBlog(req.params._id, {
+    const updatedBlog = await updateBlog(req.params._id, {
       $set: req.body,
     }).populate("userId", "-password")
 

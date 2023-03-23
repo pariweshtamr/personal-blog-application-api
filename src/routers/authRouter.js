@@ -1,8 +1,16 @@
 import express from "express"
 import { comparePassword, hashPassword } from "../helpers/bcryptHelper.js"
-import { createJwts } from "../helpers/jwtHelper.js"
+import {
+  createJwts,
+  signAccessJWT,
+  verifyRefreshJWT,
+} from "../helpers/jwtHelper.js"
 import { verifyUser } from "../middlewares/authMiddleware.js"
-import { createUser, getUserByFilter } from "../models/User/UserModel.js"
+import {
+  createUser,
+  getUserByFilter,
+  getUserById,
+} from "../models/User/UserModel.js"
 
 const router = express.Router()
 
@@ -86,7 +94,38 @@ router.post("/login", async (req, res, next) => {
       status: "success",
       message: "Login Successful",
       tokens,
-      user,
+    })
+  } catch (error) {
+    next(error)
+  }
+})
+
+// get new accessJwt
+router.get("/accessJwt", async (req, res, next) => {
+  try {
+    const refreshJwt = req.headers.authorization
+    const decoded = verifyRefreshJWT(refreshJwt)
+
+    if (!decoded?._id) return
+
+    // check if refreshJwt exists in db
+    const user = await getUserById({ _id: decoded._id })
+
+    // if refreshJwt is valid, create new accessJwt and send to client
+    if (user?._id) {
+      const accessJwt = await signAccessJWT({
+        _id: decoded._id,
+      })
+
+      return res.json({
+        status: "success",
+        accessJwt,
+      })
+    }
+
+    res.status(401).json({
+      status: "error",
+      message: "Invalid refresh token!",
     })
   } catch (error) {
     next(error)
