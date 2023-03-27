@@ -13,7 +13,7 @@ const BlogSchema = new mongoose.Schema(
       unique: true,
       trim: true,
     },
-    desc: {
+    content: {
       type: String,
       required: true,
     },

@@ -1,5 +1,4 @@
 import express from "express"
-import { verifyUser } from "../middlewares/authMiddleware.js"
 import {
   createBlog,
   deleteBlog,
@@ -14,7 +13,7 @@ const router = express.Router()
 router.get("/getAll", async (req, res, next) => {
   try {
     const blogs = await getAllBlogs().populate("userId", "-password")
-    return res.status(200).json(blogs)
+    return res.status(200).json({ status: "success", blogs })
   } catch (error) {
     next(error)
   }
@@ -43,7 +42,7 @@ router.get("/featured", async (req, res, next) => {
   }
 })
 
-router.post("/", verifyUser, async (req, res, next) => {
+router.post("/", async (req, res, next) => {
   try {
     const blog = await createBlog({ ...req.body, userId: req.user._id })
     if (!blog?._id) {
@@ -62,7 +61,7 @@ router.post("/", verifyUser, async (req, res, next) => {
   }
 })
 
-router.put("/updateBlog/:_id", verifyUser, async (req, res, next) => {
+router.put("/updateBlog/:_id", async (req, res, next) => {
   try {
     const blog = await getSingleBlog(req.params._id)
     if (blog.userId.toString() !== req.user._id.toString()) {
@@ -93,7 +92,7 @@ router.put("/likeBlog", async (req, res, next) => {
   }
 })
 
-router.delete("/deleteBlog/:_id", verifyUser, async (req, res, next) => {
+router.delete("/deleteBlog/:_id", async (req, res, next) => {
   try {
     const blog = await getSingleBlog(req.params._id)
     if (blog.userId !== req.user._id) {

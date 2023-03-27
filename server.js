@@ -21,11 +21,12 @@ app.use(cors())
 import authRouter from "./src/routers/authRouter.js"
 import blogRouter from "./src/routers/blogRouter.js"
 import categoryRouter from "./src/routers/categoryRouter.js"
+import { verifyUser } from "./src/middlewares/authMiddleware.js"
 
 // use routers
 app.use("/api/auth", authRouter)
-app.use("/api/blog", blogRouter)
-app.use("/api/category", categoryRouter)
+app.use("/api/blog", verifyUser, blogRouter)
+app.use("/api/category", verifyUser, categoryRouter)
 
 // Global error handler
 app.use((error, req, res, next) => {
