@@ -2,6 +2,20 @@ import mongoose from "mongoose"
 
 const BlogSchema = new mongoose.Schema(
   {
+    status: {
+      type: String,
+      default: "inactive",
+    },
+    slug: {
+      type: String,
+      unique: true,
+      required: true,
+      index: 1,
+      deafult: "",
+    },
+    read: {
+      type: String,
+    },
     userId: {
       type: mongoose.Types.ObjectId,
       ref: "User",

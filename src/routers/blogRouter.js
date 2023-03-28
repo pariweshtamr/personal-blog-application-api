@@ -19,13 +19,13 @@ router.get("/getAll", async (req, res, next) => {
   }
 })
 
-router.get("/find/:_id", async (req, res, next) => {
+router.get("/find/:slug", async (req, res, next) => {
   try {
-    const { _id } = req.params
-    const blog = await getSingleBlog(_id).populate("userId", "-password")
+    const { slug } = req.params
+    const blog = await getSingleBlog(slug).populate("userId", "-password")
     blog.views += 1
     blog.save()
-    return res.status(200).json(blog)
+    return res.status(200).json({ status: "success", blog })
   } catch (error) {
     next(error)
   }
@@ -44,7 +44,8 @@ router.get("/featured", async (req, res, next) => {
 
 router.post("/", async (req, res, next) => {
   try {
-    const blog = await createBlog({ ...req.body, userId: req.user._id })
+    const slug = slugify(req.body.title, { lower: true })
+    const blog = await createBlog({ ...req.body, userId: req.user._id, slug })
     if (!blog?._id) {
       return res.json({
         status: "error",
