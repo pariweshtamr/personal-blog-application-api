@@ -19,7 +19,7 @@ router.get("/", async (req, res, next) => {
   }
 })
 
-router.post("/", async (req, res, next) => {
+router.post("/", verifyUser, async (req, res, next) => {
   try {
     const name = req.body.name.toLowerCase()
 

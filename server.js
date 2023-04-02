@@ -25,8 +25,8 @@ import { verifyUser } from "./src/middlewares/authMiddleware.js"
 
 // use routers
 app.use("/api/auth", authRouter)
-app.use("/api/blog", verifyUser, blogRouter)
-app.use("/api/category", verifyUser, categoryRouter)
+app.use("/api/blog", blogRouter)
+app.use("/api/category", categoryRouter)
 
 // Global error handler
 app.use((error, req, res, next) => {
