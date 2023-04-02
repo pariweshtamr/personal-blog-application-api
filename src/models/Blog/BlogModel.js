@@ -4,8 +4,12 @@ export const getAllBlogs = () => {
   return BlogSchema.find()
 }
 
-export const getSingleBlog = (_id) => {
-  return BlogSchema.findById(_id)
+export const getSingleBlog = (slug) => {
+  return BlogSchema.findOne({ slug })
+}
+
+export const getBlogById = (id) => {
+  return BlogSchema.findById(id)
 }
 
 export const getBlogsByFilter = (filter) => {
@@ -16,8 +20,8 @@ export const createBlog = (obj) => {
   return BlogSchema(obj).save()
 }
 
-export const updateBlog = (_id, update) => {
-  return BlogSchema.findByIdAndUpdate(_id, update, { new: true })
+export const updateBlog = (filter, update) => {
+  return BlogSchema.findOneAndUpdate(filter, update, { new: true })
 }
 
 export const deleteBlog = (_id) => {

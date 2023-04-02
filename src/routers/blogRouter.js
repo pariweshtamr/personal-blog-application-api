@@ -3,10 +3,13 @@ import {
   createBlog,
   deleteBlog,
   getAllBlogs,
+  getBlogById,
   getBlogsByFilter,
   getSingleBlog,
   updateBlog,
 } from "../models/Blog/BlogModel.js"
+import slugify from "slugify"
+import DOMPurify from "isomorphic-dompurify"
 
 const router = express.Router()
 
@@ -44,8 +47,15 @@ router.get("/featured", async (req, res, next) => {
 
 router.post("/", async (req, res, next) => {
   try {
+    const { cleanContent } = req.body
+    const content = DOMPurify.sanitize(cleanContent)
     const slug = slugify(req.body.title, { lower: true })
-    const blog = await createBlog({ ...req.body, userId: req.user._id, slug })
+    const blog = await createBlog({
+      ...req.body,
+      content,
+      userId: req.user._id,
+      slug,
+    })
     if (!blog?._id) {
       return res.json({
         status: "error",
@@ -62,16 +72,23 @@ router.post("/", async (req, res, next) => {
   }
 })
 
-router.put("/updateBlog/:_id", async (req, res, next) => {
+router.put("/updateBlog/:slug", async (req, res, next) => {
   try {
-    const blog = await getSingleBlog(req.params._id)
+    const { slug } = req.params
+    const { cleanContent, ...rest } = req.body
+    const content = DOMPurify.sanitize(cleanContent)
+    const blog = await getSingleBlog(slug)
+
     if (blog.userId.toString() !== req.user._id.toString()) {
       throw new Error("You can only update your blog posts!")
     }
 
-    const updatedBlog = await updateBlog(req.params._id, {
-      $set: req.body,
-    }).populate("userId", "-password")
+    const updatedBlog = await updateBlog(
+      { slug },
+      {
+        $set: { ...rest, content },
+      }
+    ).populate("userId", "-password")
 
     return res.json({
       status: "success",
@@ -95,12 +112,12 @@ router.put("/likeBlog", async (req, res, next) => {
 
 router.delete("/deleteBlog/:_id", async (req, res, next) => {
   try {
-    const blog = await getSingleBlog(req.params._id)
-    if (blog.userId !== req.user._id) {
+    const blog = await getBlogById(req.params._id)
+
+    if (blog.userId.toString() !== req.user._id.toString()) {
       throw new Error("You are not authorized to delete this blog post!")
     }
     const delBlog = await deleteBlog(req.params._id)
-
     if (!delBlog?._id) {
       return res.json({
         status: "error",
