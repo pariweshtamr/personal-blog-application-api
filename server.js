@@ -27,6 +27,13 @@ app.use("/api/auth", authRouter)
 app.use("/api/blog", blogRouter)
 app.use("/api/category", categoryRouter)
 
+app.use("/", (req, res, next) => {
+  const error = {
+    message: "You have no permission!",
+  }
+  res.json(error)
+})
+
 // Global error handler
 app.use((error, req, res, next) => {
   const errorStatus = error.status || 500
@@ -38,10 +45,6 @@ app.use((error, req, res, next) => {
     message: errorMsg,
     stack: error.stack,
   })
-})
-
-app.use("/", (req, res) => {
-  res.json({ message: "Server is ready!" })
 })
 
 app.listen(PORT, (error) => {
