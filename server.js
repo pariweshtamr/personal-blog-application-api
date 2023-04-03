@@ -21,7 +21,6 @@ app.use(cors())
 import authRouter from "./src/routers/authRouter.js"
 import blogRouter from "./src/routers/blogRouter.js"
 import categoryRouter from "./src/routers/categoryRouter.js"
-import { verifyUser } from "./src/middlewares/authMiddleware.js"
 
 // use routers
 app.use("/api/auth", authRouter)
@@ -39,6 +38,10 @@ app.use((error, req, res, next) => {
     message: errorMsg,
     stack: error.stack,
   })
+})
+
+app.use("/", (req, res) => {
+  res.json({ message: "Server is ready!" })
 })
 
 app.listen(PORT, (error) => {
